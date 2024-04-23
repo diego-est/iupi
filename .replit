@@ -1,4 +1,4 @@
-run = "racket main.rkt"
+run = "racket src/main.rkt"
 
 [nix]
 channel = "stable-21_11"

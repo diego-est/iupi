@@ -21,9 +21,7 @@ iupi <program.TODO> <image-file>
 ### Numeric Operators
 - Addition:
     - `+,` Add right pixel to current pixel (int)
-    - `+.` Add right pixel to current pixel (float)
     - `,+` Add left pixel to current pixel (int)
-    - `.+` Add left pixel to current pixel (float)
 - Multiplication, Subtraction and Division:
     - Same as addition but with `-`, `*`, and `/`, instead of `+`
 ### Photographic Operators
@@ -63,3 +61,6 @@ iupi <program.TODO> <image-file>
 
 ## CFG
 TODO
+
+## To-do:
+Please visit: [to-do list](./TODO.md)
