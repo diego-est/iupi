@@ -1,0 +1,4 @@
+run = "racket main.rkt"
+
+[nix]
+channel = "stable-21_11"
