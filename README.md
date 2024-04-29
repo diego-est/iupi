@@ -60,7 +60,7 @@ iupi <program.TODO> <image-file>
 - `(R, G, B)=?${EXPR}` Run `EXPR` through every pixel in sequence until current pixel is of `(R, G, B)` color (for loop)
 
 ## CFG
-TODO
+Please visit [CFG.md](./CFG.md)
 
 ## To-do:
 Please visit: [to-do list](./TODO.md)
