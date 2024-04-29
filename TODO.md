@@ -30,15 +30,12 @@ Only some of these will be implemented ;-;
     - [ ] `\/` Move down 1 pixel
 - [ ] CLI manipulation:
     - [ ] `,` Print current pixel's int
-    - [ ] `.` Print current pixel's float
     - [ ] `_` Print current pixel's char
     - [ ] `'` Receive a single byte from the user
-    - [ ] `"` Receive two bytes from the user
-    - [ ] `"'` or `'"` Receive three bytes from the user (1 RGB pixel)
-    - [ ] `""` receive four bytes from user (1 ARGB pixel)
+    - [ ] `"` Receive three bytes from the user
 ### Control Flow Constructs
-- [ ] `(R, G, B)=?{EXPR}` Executes `EXPR` if current pixel is of `(R, G, B)` color (if statement)
-- [ ] `(R, G, B)=?#{expr}` Executes `EXPR` as long as current pixel is of `(R, G, B)` color (while loop)
-- [ ] `(R, G, B)=?${EXPR}` Run `EXPR` through every pixel in sequence until current pixel is of `(R, G, B)` color (for loop)
+- [ ] `(R, G, B)?{EXPR}` Executes `EXPR` if current pixel is of `(R, G, B)` color (if statement)
+- [ ] `(R, G, B)#{expr}` Executes `EXPR` as long as current pixel is of `(R, G, B)` color (while loop)
+- [ ] `(R, G, B)${EXPR}` Run `EXPR` through every pixel in sequence until current pixel is of `(R, G, B)` color (for loop)
 
 
