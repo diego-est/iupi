@@ -3,7 +3,6 @@ The following is a context-free grammar for the `iupi` language.
 ```txt
 <expr> ::= <numOps> | <imgOps> | <expr><expr>
 
-
 <numOps> ::= <addL> | <addR> | <mulL> | <mulR> | <subL> | <subR> | <divL> | <divR>
 <addR> ::= +,
 <addL> ::= ,+
@@ -13,7 +12,6 @@ The following is a context-free grammar for the `iupi` language.
 <subL> ::= ,-
 <divR> ::= /,
 <divL> ::= ,/
-
 
 <imgOps> ::= <interpolate> | <rotateR> | <rotateL> | <mirror>
 
@@ -52,3 +50,34 @@ The following is a context-free grammar for the `iupi` language.
 <while> ::= <set>#{<expr>}
 <forEach> ::= <set>${<expr>}
 ```
+
+## Attributes
+Interesting lexeme attributes:
+- `<colorHex>`: can be converted into a full 32-bit integer
+
+### Synthesization
+| Non-terminals | Synthesized attributes| Inherited attributes  |
+|---------------|-----------------------|-----------------------|
+| `<colorHex>`  |                       | `--`                  |
+| `<hex>`       | Val                   | `--`                  |
+| `<+,>`        |                       | `--`                  |
+
+### Base Attributes
+| Terminals | Attribute | Value |
+|-----------|-----------|-------|
+| `<digit> ::= 0` | Val | 0     |
+| `<digit> ::= 1` | Val | 1     |
+| `<digit> ::= 2` | Val | 2     |
+| `<digit> ::= 3` | Val | 3     |
+| `<digit> ::= 4` | Val | 4     |
+| `<digit> ::= 5` | Val | 5     |
+| `<digit> ::= 6` | Val | 6     |
+| `<digit> ::= 7` | Val | 7     |
+| `<digit> ::= 8` | Val | 8     |
+| `<digit> ::= 9` | Val | 9     |
+| `<hex> ::= A` | Val   | 10    |
+| `<hex> ::= B` | Val   | 11    |
+| `<hex> ::= C` | Val   | 12    |
+| `<hex> ::= D` | Val   | 13    |
+| `<hex> ::= E` | Val   | 14    |
+| `<hex> ::= F` | Val   | 15    |
