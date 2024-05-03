@@ -21,30 +21,30 @@ The following is a context-free grammar for the `iupi` language.
 <rotateR> ::= <^
 <rotateL> ::= >^
 <mirror> ::= <>
-<transpose> ::=
+<transpose> ::= &
 
 <set> ::= (<colorHex>) | (<colorU8>)
 <copyL> ::=
 <copyR> ::=
 <swap> ::=
 
-<moveR> ::=
-<moveL> ::=
-<moveD> ::=
-<moveU> ::=
+<moveR> ::= ->
+<moveL> ::= <-
+<moveD> ::= \/
+<moveU> ::= ^
 
 <printInt> ::=
 <printChar> ::=
 <receiveByte> ::=
-<receiveRGB> ::=
+<receiveRGB> ::= "' | '"
 
 <float> ::= <digits>.<digits>
 <colorHex> ::= #<hex><hex><hex><hex><hex><hex>
-<colorU8> ::=
+<colorU8> ::= <U8>, <U8>, <U8>
 <digits> ::= <digit> | <digit><digits>
 <digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 <hex> ::= A | B | C | D | E | F | <digit>
-<U8> ::=
+<U8> ::= 
 
 <if> ::= <set>?{<expr>}
 <while> ::= <set>#{<expr>}
