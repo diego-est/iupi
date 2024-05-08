@@ -1,0 +1,45 @@
+#lang plait
+
+(define (id x) x)
+
+(define-type U8
+  [num (n : Number)]
+)
+
+(define-type ImgOps
+  [interpolate (f : Number)]
+  [rotate-left]
+  [rotate-right]
+  [mirror]
+  [transpose]
+  [set (c : Color)]
+)
+
+(define-type Color
+  [hex-color (n : Number)] ;; TODO: Hex should turn a string of #FFA123 into a Number
+  [int-color (n : Number)]
+)
+
+(define-type NumOps
+  [addR (n : Number)]
+  [addL (n : Number)]
+)
+
+(define-type Expr
+  [img-op (op : ImgOps)]
+  [num-op (op : NumOps)]
+)
+
+(define (get-SetNum s) (map s-exp->number (s-exp->list s)))
+
+
+(define (parse e)
+  [cond
+    [(s-exp-match? `& e) (rotate-left)]
+    [(s-exp-match? `(Number) e) (set (get-SetNum e))]
+    [else (rotate-left)]
+  ]
+)
+
+(parse `&)
+(parse `(255))
