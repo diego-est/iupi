@@ -65,7 +65,7 @@
 
 ;; The following functor and applicative implementations for char/p were taken
 ;;  from the prelude implementation of haskell at:
-;;  https://hackage.haskell.org/package/base-4.19.1.0/docs/src/Data.Functor.html
+;;  https://hackage.haskell.org/package/base-4.19.1.0/docs/src/GHC.Base.html
 
 ;; char/p functor
 (define (fmap f p)
@@ -87,6 +87,7 @@
                   [(none) (none)])]
       [(none) (none)])))
 
+;; TODO: figure out what the type check error means.
 ;(define (sequenceA [lst : (Listof (String -> (Optionof (String * 'a))))])
 ;  (if (empty? lst) (pure (list)) (seq (fmap cons (first lst)) (sequenceA (rest lst)))))
   
