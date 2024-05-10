@@ -241,6 +241,18 @@
     (let ([res1 ((first ps) input)])
     (foldr alt res1 (map (λ (p) (p input)) (rest ps))))))
 
+;(define (both
+
+;(define (p-and [ps : (Listof (Parser 'a))]) : (Parser 'a)
+;  (λ (input)
+;    (let ([res1 ((first ps) input)])
+;      (
+
+(define (p-seq [p1 : (Parser 'a)] [p2 : (Parser 'b)]) : (Parser ('a * 'b))
+  (λ (input) (do (p1 input)
+               (λ (res1) (do (p2 (fst res1))
+                           (λ (res2) (p-result (fst res2) (pair (snd res1) (snd res2)))))))))
+
 (define (p-append [r1 : (ParseResult Char)] [r2 : (ParseResult String)]) : (ParseResult String)
   (type-case (ParseResult Char) r1
     [(ok p1) (type-case (ParseResult String) r2
@@ -338,34 +350,48 @@
         (char/p #\-))))
 
 (define (half-op [s : String]) : (ParseResult (Char * Color))
-  (do (ops s)
-    (λ (char-res) (do (p-color (fst char-res))
-                    (λ (color-res) (p-result (fst color-res) (pair (snd char-res) (snd color-res))))))))
+  (do ((p-seq ops p-color) s)
+    (λ (result) (p-result (fst result) (snd result)))))
 
-(define (p-op2 [s : String]) : (ParseResult Operation)
-  (do (p-op s)
-    (λ (result) (do (half-op (fst result))
-                  (λ (char-color) (p-result (fst char-color)
-                                            [let ([ch (fst (snd char-color))] [col (snd (snd char-color))])
-                                               [cond
-                                                 [(char=? ch #\+) (add col (operation (snd result)))]
-                                                 [(char=? ch #\*) (multiply col (operation (snd result)))]
-                                                 [(char=? ch #\/) (divide col (operation (snd result)))]
-                                                 [(char=? ch #\-) (subtract col (operation (snd result)))]]]))))))
+;(define (half-op [s : String]) : (ParseResult (Char * Color))
+;  (do (ops s)
+;    (λ (char-res) (do (p-color (fst char-res))
+;                    (λ (color-res) (p-result (fst color-res) (pair (snd char-res) (snd color-res))))))))
 
-(define (concat-op [s : String] [op : Operation]) : (ParseResult Operation)
-  (do (half-op s)
-    (λ (char-color) (p-result (fst char-color)
-                                            [let ([ch (fst (snd char-color))] [col (snd (snd char-color))])
-                                               [cond
-                                                 [(char=? ch #\+) (add col (operation op))]
-                                                 [(char=? ch #\*) (multiply col (operation op))]
-                                                 [(char=? ch #\/) (divide col (operation op))]
-                                                 [(char=? ch #\-) (subtract col (operation op))]]]))))
+;(define (p-op2 [s : String]) : (ParseResult Operation)
+;  (do (p-op s)
+;    (λ (result) (do (half-op (fst result))
+;                  (λ (char-color) (p-result (fst char-color)
+;                                            [let ([ch (fst (snd char-color))] [col (snd (snd char-color))])
+;                                               [cond
+;                                                 [(char=? ch #\+) (add col (operation (snd result)))]
+;                                                 [(char=? ch #\*) (multiply col (operation (snd result)))]
+;                                                 [(char=? ch #\/) (divide col (operation (snd result)))]
+;                                                 [(char=? ch #\-) (subtract col (operation (snd result)))]]]))))))
+
+;(define (concat-op [s : String] [op : Operation]) : (ParseResult Operation)
+;  (do (half-op s)
+;    (λ (char-color) (p-result (fst char-color)
+;                                            [let ([ch (fst (snd char-color))] [col (snd (snd char-color))])
+;                                               [cond
+;                                                 [(char=? ch #\+) (add col (operation op))]
+;                                                 [(char=? ch #\*) (multiply col (operation op))]
+;                                                 [(char=? ch #\/) (divide col (operation op))]
+;                                                 [(char=? ch #\-) (subtract col (operation op))]]]))))
+
+(define (concat-op-list [first : Operation] [lst : (Listof (Char * Color))]) : Operation
+  (foldl (λ (char-color acc)
+           [let ([ch (fst char-color)] [col (snd char-color)])
+             [cond
+               [(char=? ch #\+) (add col (operation acc))]
+               [(char=? ch #\*) (multiply col (operation acc))]
+               [(char=? ch #\/) (divide col (operation acc))]
+               [(char=? ch #\-) (subtract col (operation acc))]]]) first lst))
 
 (define (p-many1-op [s : String]) : (ParseResult Operation)
   (do (p-op s)
-    (λ (result)
+    (λ (result) (do ((p-many1 (p-seq ops p-color)) (fst result))
+                  (λ (result2) (p-result (fst result2) (concat-op-list (snd result) (snd result2))))))))
 
 ;; some tests
 ;((fmap (const #\a) (char/p #\n)) "nice")
@@ -390,3 +416,6 @@
 (p-op "(255,0,42)/(42,42,42)")
 
 (eval-op (add (grayscale-color 1) (operation (add (grayscale-color 2) (color (rgb-color 1 2 3))))))
+
+(do (p-many1-op "(255,0,42)+(42,42,42)*(456)/(2)")
+  (λ (op) (p-result (fst op) (eval-op (snd op)))))
