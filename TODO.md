@@ -38,4 +38,6 @@ Only some of these will be implemented ;-;
 - [ ] `(R, G, B)#{expr}` Executes `EXPR` as long as current pixel is of `(R, G, B)` color (while loop)
 - [ ] `(R, G, B)${EXPR}` Run `EXPR` through every pixel in sequence until current pixel is of `(R, G, B)` color (for loop)
 
+- [ ] Modularize the utilities and parser implementations in `main.rkt`
+- [ ] Clean up the code with `(do)` statements
 
