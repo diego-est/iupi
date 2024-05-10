@@ -11,6 +11,9 @@
 (define (iota n)
   (build-list n id))
 
+(define (mod255 n)
+  (modulo n 255))
+
 (define (char->string [ch : Char]) : String
   (list->string (list ch)))
 
@@ -77,36 +80,92 @@
 
 ;; Language implementation
 ;; Language types
-(define-type U8
-  [num (n : Number)])
-
-(define-type ImgOps
-  [interpolate (f : Number)]
-  [rotate-left]
-  [rotate-right]
-  [mirror]
-  [transpose]
-  [setter (c : Color)])
-
-(define-type Color
-;  [hex-color (n : Number)] ;; TODO: Hex should turn a string of #FFA123 into a Number
-;  [rgb-color (n : (Number * Number * Number))]
-  [grayscale-color (n : Number)])
-
-(define (color-add [c1 : Color] [c2 : Color]) : Color
-  (type-case Color c1
-;    [(hex-color n) ]
-;    [(rgb-color nnn) ]
-    [(grayscale-color n) (type-case Color c2
-                           [(grayscale-color m) (grayscale-color (+ n m))])]))
-
-(define-type NumOps
-  [addR (n : Number)]
-  [addL (n : Number)])
 
 (define-type Expr
-  [img-op (op : ImgOps)]
-  [num-op (op : NumOps)])
+  [operation (op : Operation)]
+  [color (c : Color)])
+
+;(define (eval [e : Expr]) : Color
+;  (type-case Expr e
+;    [(operation op rest) ()]
+
+(define-type Operation
+  [add (color : Color) (e : Expr)]
+  [subtract (color : Color) (e : Expr)]
+  [multiply (color : Color) (e : Expr)]
+  [divide (color : Color) (e : Expr)]
+  [value-invert (e : Expr)]
+  [linear-invert (e : Expr)]
+  [interpolate (color : Color) (e : Expr) (percent : Number)]
+  [hue-shift (e : Expr) (shift : Number)]
+  [max (color : Color) (e : Expr)]
+  [min (color : Color) (e : Expr)])
+
+(define (eval-op [op : Operation]) : Color
+  (type-case Operation op
+    [(add c e) (color-add c (eval e))]
+    [(subtract c e) (color-subtract c (eval e))]
+    [(multiply c e) (color-multiply c (eval e))]
+    [(divide c e) (color-divide c (eval e))]
+    [(interpolate c e f) (color-interpolate c (eval e) f)]
+    [(value-invert e) (color-value-invert (eval e))]
+    [(linear-invert e) (color-linear-invert (eval e))]
+    [(hue-shift e n) (color-hue-shift (eval e) n)]
+    [(max c e) (color-max c (eval e))]
+    [(min c e) (color-min c (eval e))]))
+
+(define (eval [e : Expr]) : Color
+  (type-case Expr e
+    [(operation op) (eval-op op)]
+    [(color c) c]))
+
+(define-type Color
+  [rgb-color (red : Number) (green : Number) (blue : Number)]
+  [grayscale-color (n : Number)])
+
+(define (binary-color-op [c1 : Color] [c2 : Color] [f : (Number Number -> Number)]) : Color
+  (normalize-color (type-case Color c1
+    [(rgb-color r1 g1 b1) (type-case Color c2
+                            [(rgb-color r2 g2 b2) (rgb-color (f r1 r2) (f g1 g2) (f b1 b2))]
+                            [(grayscale-color m) (rgb-color (f r1 m) (f g1 m) (f b1 m))])]
+    [(grayscale-color n) (type-case Color c2
+                           [(grayscale-color m) (grayscale-color (f n m))]
+                           [(rgb-color r g b) (rgb-color (f r n) (f g n) (f b n))])])))  
+
+(define (color-add [c1 : Color] [c2 : Color]) : Color
+  (binary-color-op c1 c2 +))
+
+(define (color-multiply [c1 : Color] [c2 : Color]) : Color
+  (binary-color-op c1 c2 *))
+
+(define (color-divide [c1 : Color] [c2 : Color]) : Color
+  (binary-color-op c1 c2 (λ (n m) (if (= m 0) 0 (floor (/ n m))))))
+
+(define (color-subtract [c1 : Color] [c2 : Color]) : Color
+  (binary-color-op c1 c2 -))
+
+(define (color-value-invert [c : Color]) : Color
+  c)
+
+(define (color-linear-invert [c : Color]) : Color
+  c)
+
+(define (color-interpolate [c1 : Color] [c2 : Color] [percent : Number]) : Color
+  c1)
+
+(define (color-hue-shift [c : Color] [shift : Number]) : Color
+  c)
+
+(define (color-max [c1 : Color] [c2 : Color]) : Color
+  c1)
+
+(define (color-min [c1 : Color] [c2 : Color]) : Color
+  c1)
+
+(define (normalize-color [c : Color]) : Color
+  (type-case Color c
+    [(rgb-color r g b) (rgb-color (mod255 r) (mod255 g) (mod255 b))]
+    [(grayscale-color n) (grayscale-color (mod255 n))]))
 
 ;; char/p implementation
 (define (char/p [c : Char]) : (Parser Char)
@@ -172,11 +231,6 @@
   (foldr (flip m-prepend) (pure "") (reverse (map char/p (string->list s)))))
 
 ;; parsers
-(define (p-transpose [s : String]) : (ParseResult 'a)
-  (type-case (ParseResult String) ((string/p "&") s)
-    [(ok result) (ok (pair (fst result) (list transpose)))]
-    [(err) (err)]))
-
 (define (alt [res1 : (ParseResult 'a)] [res2 : (ParseResult 'a)]) : (ParseResult 'a)
   (type-case (ParseResult 'a) res1
     [(ok x) (ok x)]
@@ -240,21 +294,99 @@
                 (foldl (λ (acc x) (+ (* 10 x) acc)) 0 (map char->num (snd char-list)))))))
 
 (define (p-color [s : String]) : (ParseResult Color)
+  (alt (p-grayscale-color s) (p-rgb-color s)))
+
+(define (p-grayscale-color [s : String]) : (ParseResult Color)
   (do ((left-p (right-p (char/p #\() p-number) (char/p #\))) s)
     (λ (result) (p-result (fst result) (grayscale-color (snd result))))))
 
-(define (p-add [s : String]) : (ParseResult Color)
-  (do (p-color s)
-    (λ (col1) (do ((right-p (char/p #\+) p-color) (fst col1))
-                (λ (col2) (p-result (fst col2) (color-add (snd col1) (snd col2))))))))
-               
-;; some tests
-((fmap (const #\a) (char/p #\n)) "nice")
-(map char/p (string->list "null"))
-((m-join (char/p #\a) (char/p #\p)) "apple")
-((m-prepend (m-join (char/p #\a) (char/p #\p)) (char/p #\p)) "apple")
+(define (p-rgb-color [s : String]) : (ParseResult Color)
+  (do ((left-p (right-p (char/p #\() p-number) (char/p #\,)) s)
+    (λ (n1) (do ((left-p p-number (char/p #\,)) (fst n1))
+                  (λ (n2) (do ((left-p p-number (char/p #\))) (fst n2))
+                            (λ (n3) (p-result (fst n3) (rgb-color (snd n1) (snd n2) (snd n3))))))))))
 
+(define (p-binary-op [s : String] [sym : Char] [f : (Color Color -> 'a)]) : (ParseResult 'a)
+  (do (p-color s)
+    (λ (col1) (do ((right-p (char/p sym) p-color) (fst col1))
+               (λ (col2) (p-result (fst col2) (f (snd col1) (snd col2))))))))
+       
+(define (p-add [s : String]) : (ParseResult Operation)
+  (p-binary-op s #\+ (λ (c1 c2)
+                       (add c1 (color c2)))))
+
+(define (p-multiply [s : String]) : (ParseResult Operation)
+  (p-binary-op s #\* (λ (c1 c2)
+                       (multiply c1 (color c2)))))
+
+(define (p-subtract [s : String]) : (ParseResult Operation)
+  (p-binary-op s #\- (λ (c1 c2)
+                       (subtract c1 (color c2)))))
+
+(define (p-divide [s : String]) : (ParseResult Operation)
+  (p-binary-op s #\/ (λ (c1 c2)
+                       (divide c1 (color c2)))))
+
+(define (p-op [s : String]) : (ParseResult Operation)
+  (do ((p-or (list p-add p-multiply p-subtract p-divide)) s)
+    (λ (result) (ok result))))
+
+(define ops : (Parser Char)
+  (p-or (list (char/p #\+)
+        (char/p #\*)
+        (char/p #\/)
+        (char/p #\-))))
+
+(define (half-op [s : String]) : (ParseResult (Char * Color))
+  (do (ops s)
+    (λ (char-res) (do (p-color (fst char-res))
+                    (λ (color-res) (p-result (fst color-res) (pair (snd char-res) (snd color-res))))))))
+
+(define (p-op2 [s : String]) : (ParseResult Operation)
+  (do (p-op s)
+    (λ (result) (do (half-op (fst result))
+                  (λ (char-color) (p-result (fst char-color)
+                                            [let ([ch (fst (snd char-color))] [col (snd (snd char-color))])
+                                               [cond
+                                                 [(char=? ch #\+) (add col (operation (snd result)))]
+                                                 [(char=? ch #\*) (multiply col (operation (snd result)))]
+                                                 [(char=? ch #\/) (divide col (operation (snd result)))]
+                                                 [(char=? ch #\-) (subtract col (operation (snd result)))]]]))))))
+
+(define (concat-op [s : String] [op : Operation]) : (ParseResult Operation)
+  (do (half-op s)
+    (λ (char-color) (p-result (fst char-color)
+                                            [let ([ch (fst (snd char-color))] [col (snd (snd char-color))])
+                                               [cond
+                                                 [(char=? ch #\+) (add col (operation op))]
+                                                 [(char=? ch #\*) (multiply col (operation op))]
+                                                 [(char=? ch #\/) (divide col (operation op))]
+                                                 [(char=? ch #\-) (subtract col (operation op))]]]))))
+
+(define (p-many1-op [s : String]) : (ParseResult Operation)
+  (do (p-op s)
+    (λ (result)
+
+;; some tests
+;((fmap (const #\a) (char/p #\n)) "nice")
+;(map char/p (string->list "null"))
+;((m-join (char/p #\a) (char/p #\p)) "apple")
+;((m-prepend (m-join (char/p #\a) (char/p #\p)) (char/p #\p)) "apple")
 
 (p-number "123")
 (p-color "(123)")
+(p-color "(123,54,42)")
+
 (p-add "(123)+(579)")
+
+(p-op "(255,0,42)+(42,42,42)")
+(do (p-op "(255,0,42)+(42,42,42)")
+  (λ (op) (p-result (fst op) (eval-op (snd op)))))
+(p-op "(123)*(579)")
+(p-op "(255,0,42)*(42,42,42)")
+(p-op "(123)-(579)")
+(p-op "(255,0,42)-(42,42,42)")
+(p-op "(123)/(579)")
+(p-op "(255,0,42)/(42,42,42)")
+
+(eval-op (add (grayscale-color 1) (operation (add (grayscale-color 2) (color (rgb-color 1 2 3))))))
