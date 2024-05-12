@@ -11,8 +11,8 @@
 (define (iota n)
   (build-list n id))
 
-(define (mod255 n)
-  (modulo n 255))
+(define (mod256 n)
+  (modulo n 256))
 
 (define (char->string [ch : Char]) : String
   (list->string (list ch)))
@@ -164,8 +164,8 @@
 
 (define (normalize-color [c : Color]) : Color
   (type-case Color c
-    [(rgb-color r g b) (rgb-color (mod255 r) (mod255 g) (mod255 b))]
-    [(grayscale-color n) (grayscale-color (mod255 n))]))
+    [(rgb-color r g b) (rgb-color (mod256 r) (mod256 g) (mod256 b))]
+    [(grayscale-color n) (grayscale-color (mod256 n))]))
 
 ;; char/p implementation
 (define (char/p [c : Char]) : (Parser Char)
