@@ -136,7 +136,7 @@
   (binary-color-op c1 c2 +))
 
 (define (color-multiply [c1 : Color] [c2 : Color]) : Color
-  (binary-color-op c1 c2 *))
+  (binary-color-op c1 c2 (λ (n m) (floor (* n m)))))
 
 (define (color-divide [c1 : Color] [c2 : Color]) : Color
   (binary-color-op c1 c2 (λ (n m) (if (= m 0) 0 (floor (/ n m))))))
@@ -151,7 +151,7 @@
   c)
 
 (define (color-interpolate [c1 : Color] [c2 : Color] [percent : Number]) : Color
-  c1)
+  (color-add [color-multiply {color-subtract c2 c1} {rgb-color percent percent percent}] c1))
 
 (define (color-hue-shift [c : Color] [shift : Number]) : Color
   c)
