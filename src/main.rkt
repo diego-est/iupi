@@ -123,6 +123,7 @@
   [rgb-color (red : Number) (green : Number) (blue : Number)]
   [grayscale-color (n : Number)])
 
+; Setup for operations
 (define (binary-color-op [c1 : Color] [c2 : Color] [f : (Number Number -> Number)]) : Color
   (normalize-color (type-case Color c1
     [(rgb-color r1 g1 b1) (type-case Color c2
@@ -132,6 +133,7 @@
                            [(grayscale-color m) (grayscale-color (f n m))]
                            [(rgb-color r g b) (rgb-color (f r n) (f g n) (f b n))])])))  
 
+; Definition of all operations
 (define (color-add [c1 : Color] [c2 : Color]) : Color
   (binary-color-op c1 c2 +))
 
@@ -148,7 +150,7 @@
   c)
 
 (define (color-linear-invert [c : Color]) : Color
-  c)
+  (color-subtract [rgb-color 255 255 255] c))
 
 (define (color-interpolate [c1 : Color] [c2 : Color] [percent : Number]) : Color
   (color-add [color-multiply {color-subtract c2 c1} {rgb-color percent percent percent}] c1))
