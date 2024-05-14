@@ -415,7 +415,9 @@
 (p-op "(123)/(579)")
 (p-op "(255,0,42)/(42,42,42)")
 
-(eval-op (add (grayscale-color 1) (operation (add (grayscale-color 2) (color (rgb-color 1 2 3))))))
+;(eval-op (add (grayscale-color 1) (operation (add (grayscale-color 2) (color (rgb-color 1 2 3))))))
+
+(p-many1-op "(255,0,42)+(42,42,42)*(456)/(2)")
 
 (do (p-many1-op "(255,0,42)+(42,42,42)*(456)/(2)")
   (λ (op) (p-result (fst op) (eval-op (snd op)))))

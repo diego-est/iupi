@@ -2,19 +2,19 @@ The following is a context-free grammar for the `iupi` language.
 
 ```txt
 <epsilon> ::= ''
-<expr> ::= <operation><expr> | <epsilon>
+<expr> ::= <operation> | <color>
 
 <operation> ::= <add> | <multiply> | <subtract> | <divide> | <value invert> | <linear invert> | <interpolate> | <contrast> | <max> | <min>
-<add> ::= <color> + <color>
-<multiply> ::= <color> * <color>
-<subtract> ::= <color> - <color>
-<divide> ::= <color> / <color>
-<value invert> ::= <^>
-<linear invert> ::= <|>
-<interpolate> ::= <color> <float> <color>
-<hue shift> ::= <color> & <integer>
-<max> ::= <color> ^ <color>
-<min> ::= <color> ! <color>
+<add> ::= <color> + <expr>
+<multiply> ::= <color> * <expr>
+<subtract> ::= <color> - <expr>
+<divide> ::= <color> / <expr>
+<value invert> ::= <expr> <^>
+<linear invert> ::= <expr> <|>
+<interpolate> ::= <color> <float> <expr>
+<hue shift> ::= <expr> & <integer>
+<max> ::= <color> ^ <expr>
+<min> ::= <color> ! <expr>
 
 <float> ::= .<digits> | <digits>.<digits>
 <integer> ::= <digits>
