@@ -11,8 +11,8 @@
 (define (iota n)
   (build-list n id))
 
-(define (mod255 n)
-  (modulo n 255))
+(define (mod256 n)
+  (modulo n 256))
 
 (define (char->string [ch : Char]) : String
   (list->string (list ch)))
@@ -123,6 +123,7 @@
   [rgb-color (red : Number) (green : Number) (blue : Number)]
   [grayscale-color (n : Number)])
 
+; Setup for operations
 (define (binary-color-op [c1 : Color] [c2 : Color] [f : (Number Number -> Number)]) : Color
   (normalize-color (type-case Color c1
     [(rgb-color r1 g1 b1) (type-case Color c2
@@ -132,11 +133,12 @@
                            [(grayscale-color m) (grayscale-color (f n m))]
                            [(rgb-color r g b) (rgb-color (f r n) (f g n) (f b n))])])))  
 
+; Definition of all operations
 (define (color-add [c1 : Color] [c2 : Color]) : Color
   (binary-color-op c1 c2 +))
 
 (define (color-multiply [c1 : Color] [c2 : Color]) : Color
-  (binary-color-op c1 c2 *))
+  (binary-color-op c1 c2 (λ (n m) (floor (* n m)))))
 
 (define (color-divide [c1 : Color] [c2 : Color]) : Color
   (binary-color-op c1 c2 (λ (n m) (if (= m 0) 0 (floor (/ n m))))))
@@ -148,10 +150,10 @@
   c)
 
 (define (color-linear-invert [c : Color]) : Color
-  c)
+  (color-subtract [rgb-color 255 255 255] c))
 
 (define (color-interpolate [c1 : Color] [c2 : Color] [percent : Number]) : Color
-  c1)
+  (color-add [color-multiply {color-subtract c2 c1} {rgb-color percent percent percent}] c1))
 
 (define (color-hue-shift [c : Color] [shift : Number]) : Color
   c)
@@ -164,8 +166,8 @@
 
 (define (normalize-color [c : Color]) : Color
   (type-case Color c
-    [(rgb-color r g b) (rgb-color (mod255 r) (mod255 g) (mod255 b))]
-    [(grayscale-color n) (grayscale-color (mod255 n))]))
+    [(rgb-color r g b) (rgb-color (mod256 r) (mod256 g) (mod256 b))]
+    [(grayscale-color n) (grayscale-color (mod256 n))]))
 
 ;; char/p implementation
 (define (char/p [c : Char]) : (Parser Char)
