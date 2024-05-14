@@ -30,13 +30,10 @@
 ; on each field of an RGB Color
 ; Below the definition of this function there are several examples.
 (define (binary-color-op [c1 : Color] [c2 : Color] [f : (Number Number -> Number)]) : Color
-  (normalize-color (type-case Color c1
-    [(rgb-color r1 g1 b1) (type-case Color c2
-                            [(rgb-color r2 g2 b2) (rgb-color (f r1 r2) (f g1 g2) (f b1 b2))]
-                            [(grayscale-color m) (rgb-color (f r1 m) (f g1 m) (f b1 m))])]
-    [(grayscale-color n) (type-case Color c2
-                           [(grayscale-color m) (grayscale-color (f n m))]
-                           [(rgb-color r g b) (rgb-color (f r n) (f g n) (f b n))])])))
+  (normalize-color (rgb-color
+		     (f (red c1) (red c2))
+		     (f (green c1) (green c2))
+		     (f (blue c1) (blue c2)))))
 
 ;----- Language Functionality -----;
 ; Add two colors
@@ -81,9 +78,7 @@
 
 ; Normalize a color modulo 256
 (define (normalize-color [c : Color]) : Color
-  (type-case Color c
-    [(rgb-color r g b) (rgb-color (mod256 r) (mod256 g) (mod256 b))]
-    [(grayscale-color n) (grayscale-color (mod256 n))]))
+    (rgb-color (mod256 (red c)) (mod256 (green c)) (mod256 (blue c))))
 
 ;----- The Great Parser -----;
 ; Parser that parses many operations
@@ -111,24 +106,18 @@
 ;((m-prepend (m-join (char/p #\a) (char/p #\p)) (char/p #\p)) "apple")
 
 (p-number "123")
-(p-color "(123)")
 (p-color "(123,54,42)")
-
-(p-add "(123)+(579)")
 
 (p-op "(255,0,42)+(42,42,42)")
 (do (p-op "(255,0,42)+(42,42,42)")
   (λ (op) (p-result (fst op) (eval-op (snd op)))))
-(p-op "(123)*(579)")
 (p-op "(255,0,42)*(42,42,42)")
-(p-op "(123)-(579)")
 (p-op "(255,0,42)-(42,42,42)")
-(p-op "(123)/(579)")
 (p-op "(255,0,42)/(42,42,42)")
 
 ;(eval-op (add (grayscale-color 1) (operation (add (grayscale-color 2) (color (rgb-color 1 2 3))))))
 
-(many1/p-op "(255,0,42)+(42,42,42)*(456)/(2)")
+(many1/p-op "(255,0,42)+(42,42,42)*(456,4,56)/(2,0,0)")
 
-(do (many1/p-op "(255,0,42)+(42,42,42)*(456)/(2)")
+(do (many1/p-op "(255,0,42)+(42,42,42)*(456,345,1000000)/(2,0,0)")
   (λ (op) (p-result (fst op) (eval-op (snd op)))))

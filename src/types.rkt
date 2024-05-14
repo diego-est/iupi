@@ -20,9 +20,9 @@
   [min (color : Color) (e : Expr)])
 
 ; Color type
-(define-type Color
-  [rgb-color (red : Number) (green : Number) (blue : Number)]
-  [grayscale-color (n : Number)])
+(define-type-alias (Color) (Number * (Number * Number)))
+
+;(define-type-alias (HSVColor) (Number * Number * Number))
 
 ;----- Parser Types -----;
 (define-type (ParseResult 'a)

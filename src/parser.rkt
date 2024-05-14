@@ -68,13 +68,7 @@
 ;; Language Functionality Parsers ;;
 ; Parses a color.
 (define (p-color [s : String]) : (ParseResult Color)
-  (alt (p-grayscale-color s) (p-rgb-color s)))
-
-; Parses a Grayscale Color.
-; A correctly formed color has the following RegEx: "([0-9]+)"
-(define (p-grayscale-color [s : String]) : (ParseResult Color)
-  (do ((left/p (right/p (char/p #\() p-number) (char/p #\))) s)
-    (λ (result) (p-result (fst result) (grayscale-color (snd result))))))
+  (p-rgb-color s))
 
 ; Parses an RGB Color.
 ; A correctly formed color has the following RegEx: "([0-9]+,[0-9]+,[0-9]+)"
