@@ -80,12 +80,44 @@
 (define (normalize-color [c : Color]) : Color
     (rgb-color (mod256 (red c)) (mod256 (green c)) (mod256 (blue c))))
 
-;----- The Great Parser -----;
-; Parser that parses many operations
-(define (many1/p-op [s : String]) : (ParseResult Operation)
-  (do (p-op s)
-    (λ (result) (do ((many1/p (seq/p ops p-color)) (fst result))
-                  (λ (result2) (p-result (fst result2) (concat-op-list (snd result) (snd result2))))))))
+; Convert HSVColor to RGB
+(define (hsv->rgb [c : HSVColor]) : Color
+  (let [(h (hue c)) (s (saturation c)) (l (value c))]
+    (let* [(chroma (* (- 1 (abs (- (* 2 l) 1))) s))
+	   (Hprime (/ h 60))
+	   (X (* chroma (- 1 (abs (- (modulo Hprime 2) 1)))))
+	   (R1 (cond
+		 [(< Hprime 1) chroma]
+		 [(< Hprime 2) X]
+		 [(< Hprime 3) 0]
+		 [(< Hprime 4) 0]
+		 [(< Hprime 5) X]
+		 [else chroma]))
+	   (G1 (cond
+		 [(< Hprime 1) X]
+		 [(< Hprime 2) chroma]
+		 [(< Hprime 3) chroma]
+		 [(< Hprime 4) X]
+		 [(< Hprime 5) 0]
+		 [else 0]))
+	   (B1 (cond
+		 [(< Hprime 1) 0]
+		 [(< Hprime 2) 0]
+		 [(< Hprime 3) X]
+		 [(< Hprime 4) chroma]
+		 [(< Hprime 5) chroma]
+		 [else X]))
+	   (m (- l (/ chroma 2)))
+	   (R (+ R1 m))
+	   (G (+ G1 m))
+	   (B (+ B1 m))] (hsv-color R G B))))
+
+  ;----- The Great Parser -----;
+  ; Parser that parses many operations
+  (define (many1/p-op [s : String]) : (ParseResult Operation)
+    (do (p-op s)
+      (λ (result) (do ((many1/p (seq/p ops p-color)) (fst result))
+		      (λ (result2) (p-result (fst result2) (concat-op-list (snd result) (snd result2))))))))
 
 ; From a list of (character, color) concatenates all the operations and returns
 ; the underlying operation of all of those operations.

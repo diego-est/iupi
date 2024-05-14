@@ -65,6 +65,22 @@
 (define (rgb-color [r : Number] [g : Number] [b : Number]) : Color
   (pair r (pair g b)))
 
+; get hue from HSVColor
+(define (hue [c : Color]) : Number
+  (fst c))
+
+; Get saturation from HSVColor
+(define (saturation [c : Color]) : Number
+  (fst (snd c)))
+
+; Get value from HSVColor
+(define (value [c : Color]) : Number
+  (snd (snd c)))
+
+; Create an HSVColor.
+(define (hsv-color [r : Number] [g : Number] [b : Number]) : Color
+  (pair r (pair g b)))
+
 ;; List Functions ;;
 ; Builds a list up to n
 (define (iota n)
@@ -93,6 +109,10 @@
 ; Applies the leftside of a pair to the rightside
 (define (apply-pair [p : (('a -> 'b) * 'a)]) : 'b
   ((fst p) (snd p)))
+
+; Absolute value function
+(define (abs [n : Number]) : Number
+  (if (< n 0) (* -1 n) n))
 
 ;----- Parser Utilities -----;
 ; This is shorthand notation for using a (ParseResult 'a) in case it exists

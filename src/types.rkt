@@ -22,7 +22,7 @@
 ; Color type
 (define-type-alias (Color) (Number * (Number * Number)))
 
-;(define-type-alias (HSVColor) (Number * Number * Number))
+(define-type-alias (HSVColor) (Number * (Number * Number)))
 
 ;----- Parser Types -----;
 (define-type (ParseResult 'a)
