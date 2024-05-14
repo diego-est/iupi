@@ -1,0 +1,1 @@
+("8.12" ta6le ("5df5d01ca57e471125dbe14e7de5335fa2fd007b" . "75e6f1b9cf39949a94393d7c1cd7485311eaed96") #"/home/diego/Git/iupi/src/types.rkt" (collects #"drracket" #"private" #"drracket-errortrace-key.rkt") (collects #"plait" #"main.rkt") (collects #"plait" #"private" #"contract-support.rkt") (collects #"racket" #"base.rkt") (collects #"racket" #"runtime-config.rkt"))
