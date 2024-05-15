@@ -76,9 +76,42 @@
 (define (color-min [c1 : Color] [c2 : Color]) : Color
   c1)
 
+;----- Color Type Implemntation -----;
 ; Normalize a color modulo 256
 (define (normalize-color [c : Color]) : Color
-    (rgb-color (mod256 (red c)) (mod256 (green c)) (mod256 (blue c))))
+    (rgb-color (mod256 (red c)) (mod25
+
+; Get red from color.
+(define (red [c : Color]) : Number
+  (fst c))
+
+; Get green from color.
+(define (green [c : Color]) : Number
+  (fst (snd c)))
+
+; Get blue from color.
+(define (blue [c : Color]) : Number
+  (snd (snd c)))
+
+; Create a Color.
+(define (rgb-color [r : Number] [g : Number] [b : Number]) : Color
+  (pair r (pair g b)))
+
+; get hue from HSVColor
+(define (hue [c : Color]) : Number
+  (fst c))
+
+; Get saturation from HSVColor
+(define (saturation [c : Color]) : Number
+  (fst (snd c)))
+
+; Get value from HSVColor
+(define (value [c : Color]) : Number
+  (snd (snd c)))
+
+; Create an HSVColor.
+(define (hsv-color [r : Number] [g : Number] [b : Number]) : Color
+  (pair r (pair g b)))6 (green c)) (mod256 (blue c))))
 
 ; Convert HSVColor to RGB
 (define (hsv->rgb [c : HSVColor]) : Color
@@ -111,6 +144,15 @@
 	   (R (+ R1 m))
 	   (G (+ G1 m))
 	   (B (+ B1 m))] (hsv-color R G B))))
+
+(define (rgb->hsv [c : Color]) : HSVColor
+  (let* [(Xmax (max (list (red c) (green c) (blue c))))
+	 (Xmin (min (list (red c) (green c) (blue c))))
+	 (v Xmax)
+	 (c (- Xmax Xmin))
+	 (l (/ (+ Xmax Xmin) 2))
+	 ])
+  )
 
   ;----- The Great Parser -----;
   ; Parser that parses many operations

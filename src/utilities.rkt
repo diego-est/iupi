@@ -49,38 +49,6 @@
         [(char=? c #\0) 0]
       ))
 
-; Get red from color.
-(define (red [c : Color]) : Number
-  (fst c))
-
-; Get green from color.
-(define (green [c : Color]) : Number
-  (fst (snd c)))
-
-; Get blue from color.
-(define (blue [c : Color]) : Number
-  (snd (snd c)))
-
-; Create a Color.
-(define (rgb-color [r : Number] [g : Number] [b : Number]) : Color
-  (pair r (pair g b)))
-
-; get hue from HSVColor
-(define (hue [c : Color]) : Number
-  (fst c))
-
-; Get saturation from HSVColor
-(define (saturation [c : Color]) : Number
-  (fst (snd c)))
-
-; Get value from HSVColor
-(define (value [c : Color]) : Number
-  (snd (snd c)))
-
-; Create an HSVColor.
-(define (hsv-color [r : Number] [g : Number] [b : Number]) : Color
-  (pair r (pair g b)))
-
 ;; List Functions ;;
 ; Builds a list up to n
 (define (iota n)

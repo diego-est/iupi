@@ -64,6 +64,10 @@
                 (foldl (λ (acc x) (+ (* 10 x) acc)) 0 (map char->num (snd char-list)))))))
 
 ; TODO: implement parser for floats
+; Parses an entire float
+(define (p-float [s : String]) : (ParseResult Number)
+  (do (p-number s)
+    (λ (char-list))))
 
 ;; Language Functionality Parsers ;;
 ; Parses a color.
