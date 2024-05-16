@@ -80,22 +80,27 @@
                                    (v3 (interpolate-num v1 v2 prcnt))] (hsv->rgb (hsvcolor h3 s3 v3)))])]))
 
 ; Sums all rgb values of a color
-(define (sumatodo [c : RGBColor]) : Number
-  (+(+(mod256(red c))(mod256(blue c)))(mod256(green c))))
+(define (sumar-color [color : RGBColor] ) : Number
+  (+
+   (+
+    (digits->number(rgbcolor-red color))
+    (digits->number(rgbcolor-blue color)))
+    (digits->number(rgbcolor-green color))))
 
 ; Choose the color with larger values
 (define (color-max [c1 : RGBColor] [c2 : RGBColor]) : RGBColor
-      (let ((sumc1 (sumatodo c1))
-            (sumc2 (sumatodo c2)))
+      (let ((sumc1 (sumar-color c1))
+            (sumc2 (sumar-color c2)))
       (cond ((> sumc1 sumc2) c1)
              (else c2))))
 
 ; Choose the color with smaller values
 (define (color-min [c1 : RGBColor] [c2 : RGBColor]) : RGBColor
-      (let ((sumc1 (sumatodo c1))
-            (sumc2 (sumatodo c2)))
+      (let ((sumc1 (sumar-color c1))
+            (sumc2 (sumar-color c2)))
       (cond ((< sumc1 sumc2) c1)
              (else c2))))
+
 
 ; Convert HSVColor to RGB
 (define (hsv->rgb [c : HSVColor]) : RGBColor
