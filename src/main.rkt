@@ -62,8 +62,10 @@
   (bin-op-builder c1 c2 -))
 
 ; Invert the luminosity of a color
-(define (color-value-invert [c : RGBColor]) : RGBColor
-  c)
+(define (color-value-invert [c1 : RGBColor]) : RGBColor
+  (type-case HSVColor (rgb->hsv c1)
+    [(hsvcolor h1 s1 v1)
+    (let [(h2 h1) (s2 s1) (v2 (- 1 v1))] (hsv->rgb [hsvcolor h2 s2 v2]))]))
 
 ; Invert each RGB value of a color
 (define (color-linear-invert [c : RGBColor]) : RGBColor
@@ -135,7 +137,7 @@
 	 (l (/ (+ x+ x-) 2))
          (h [cond
               [(= c 0) 0]
-              [(= v r) (* 60 (modulo (/ (- g b) c) 6))]
+              [(= v r) (* 60 (modulo (round (/ (- g b) c)) 6))]
               [(= v g) (* 60 (+ (/ (- b r) c) 2))]
               [(= v b) (* 60 (+ (/ (- r g) c) 4))]
               [else 0]])
