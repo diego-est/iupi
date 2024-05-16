@@ -81,12 +81,11 @@
 
 ; Sums all rgb values of a color
 (define (sumar-color [color : RGBColor] ) : Number
-(mod256
-  (+
    (+
-    (digits->number(rgbcolor-red color))
-    (digits->number(rgbcolor-blue color)))
-    (digits->number(rgbcolor-green color)))))
+    (+
+    (mod256(digits->number(rgbcolor-red color)))
+    (mod256(digits->number(rgbcolor-blue color))))
+    (mod256(digits->number(rgbcolor-green color)))))
 
 ; Choose the color with larger values
 (define (color-max [c1 : RGBColor] [c2 : RGBColor]) : RGBColor
