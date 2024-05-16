@@ -4,6 +4,11 @@
 (require "types.rkt")
 (require "combinators.rkt")
 
+; TODO: DEPRECATED
+; Flips the arguments for function (a)
+(define (flip a)
+  (λ (x y) (a y x)))
+
 ;----- char/p implementation -----;
 ; Creates a parser that parses a single character (c)
 (define (char/p [c : Char]) : (Parser Char)
