@@ -51,8 +51,6 @@
 (define (number->digits [n : Number]) : Digits
   (if (= n 0) (empty-digit) (number (digit (modulo n 10)) (number->digits (floor (/ n 10))))))
 
-; Sums all three components
-
 ;; Miscellaneous Functions ;;
 ; Compute n modulo 256
 (define (mod256 n)

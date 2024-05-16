@@ -257,7 +257,7 @@
     [(color col) col]))
 
 ;----- Tests -----;
-(define test1 "<|><^>(400,59,0)/(1,2,3).49(7,7,7)")
+(define test1 "(255,0,42)!(42,42,42)")
 "Source:"
 test1
 "Parse tree:"
