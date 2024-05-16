@@ -12,17 +12,18 @@
   (λ (input)
     (ok (pair input x))))
 
+; TODO: DEPRECATED
 ; Creates a parser out of two parsers that will sequence the application of the
 ; first parser with the second parser. First it parses the same input with both
 ; parsers then applies the function contained within the first parser to the
 ; parsed result of the second parser. This is usually referred to as <*> in
 ; Haskell.
-(define (seq-ap [p1 : (Parser ('a -> 'b))] [p2 : (Parser 'a)]) : (Parser 'b)
-  (λ (input)
-    (type-case (ParseResult ('a -> 'b)) (p1 input)
-      [(ok f) (do (p2 input)
-                (λ (y) (return (fst y) ((snd f) (snd y)))))]
-      [(err) (err)])))
+;(define (seq-ap [p1 : (Parser ('a -> 'b))] [p2 : (Parser 'a)]) : (Parser 'b)
+;  (λ (input)
+;    (type-case (ParseResult ('a -> 'b)) (p1 input)
+;      [(ok f) (do (p2 input)
+;                (λ (y) (return (fst y) ((snd f) (snd y)))))]
+;      [(err) (err)])))
 
 ;----- Parser Combinators -----;
 ; Creates a parser that runs the entire list of parsers through an input and

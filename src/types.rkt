@@ -1,7 +1,7 @@
 #lang plait
 
 ;----- Language Types -----;
-; Language type
+; Language type :DONE
 (define-type Language
   [binary-operation (op : BinaryOperation)]
   [unary-operation (op : UnaryOperation)]
@@ -54,15 +54,23 @@
 (define-type RGBColor
   [rgbcolor (red : Digits) (blue : Digits) (green : Digits)])
 
+; HSVColor type :DONE
+(define-type HSVColor
+  [hsvcolor (hue : Number) (saturation : Number) (value : Number)])
+
+; TODO: DEPRECATED
 ; Color type
 ;(define-type-alias (Color) (Number * (Number * Number)))
 
+; TODO: DEPRECATED
 ;(define-type-alias (HSVColor) (Number * (Number * Number)))
 
 ;----- Parser Types -----;
+; TODO: document
 (define-type (ParseResult 'a)
   [ok (r : (String * 'a))]
   [err])
 
+; TODO: document
 (define-type-alias (Parser 'a)
   (String -> (ParseResult 'a)))

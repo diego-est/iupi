@@ -7,8 +7,7 @@
 ;  (pair (mod256 r) (pair (mod256 g) (mod256 b))))
 
 ; Get red from color.
-;(define (red [c : Color]) : Number
-;  (fst c))
+;(define (red [c : RGBColor]) : Number
 
 ; Get green from color.
 ;(define (green [c : Color]) : Number
@@ -41,23 +40,27 @@
 ;----- Functional utilities -----;
 
 ;; Combinators ;;
+; TODO: DEPRECATED
 ; Identity function
-(define (id x) x)
+;(define (id x) x)
 
+; TODO: DEPRECATED
 ; Constant function (always returns a)
-(define (const a)
-  (λ (b) a))
+;(define (const a)
+;  (λ (b) a))
 
+; TODO: DEPRECATED
 ; Flips the arguments for function (a)
-(define (flip a)
-  (λ (x y) (a y x)))
+;(define (flip a)
+;  (λ (x y) (a y x)))
 
 ;----- Helper functions -----;
 
 ;; String-Char Functions ;;
+; TODO: DEPRECATED
 ; Converts a single Char into a string
-(define (char->string [ch : Char]) : String
-  (list->string (list ch)))
+;(define (char->string [ch : Char]) : String
+;  (list->string (list ch)))
 
 ; Gets the first Char from a String
 (define (first-char [s : String]) : (Optionof Char)
@@ -86,19 +89,22 @@
       ))
 
 ;; List Functions ;;
+; TODO: DEPRECATED
 ; Builds a list up to n
-(define (iota n)
-  (build-list n id))
+;(define (iota n)
+;  (build-list n id))
 
+; TODO: DEPRECATED
 ; Zips two lists (the length of the resulting list is the length of the smaller list)
-(define (zip [l1 : (Listof 'a)] [l2 : (Listof 'b)]) : (Listof ('a * 'b))
-  (if (or (empty? l1) (empty? l2))
-      '()
-      (cons (pair (first l1) (first l2)) (zip (rest l1) (rest l2)))))
+;(define (zip [l1 : (Listof 'a)] [l2 : (Listof 'b)]) : (Listof ('a * 'b))
+;  (if (or (empty? l1) (empty? l2))
+;      '()
+;      (cons (pair (first l1) (first l2)) (zip (rest l1) (rest l2)))))
 
+; TODO: DEPRECATED
 ; Maps apply-pair to a list
-(define (apply-pair-list [lst : (Listof (('a -> 'b) * 'a))]) : (Listof 'b)
-  (map (λ (p) (apply-pair p)) lst))
+;(define (apply-pair-list [lst : (Listof (('a -> 'b) * 'a))]) : (Listof 'b)
+;  (map (λ (p) (apply-pair p)) lst))
 
 ; Gets the maximum number from a list
 (define (maxel [lst : (Listof Number)]) : Number
@@ -110,11 +116,15 @@
 
 ; Turns a list of digits into a Digits
 (define (digitlist->digits [digitlist : (Listof Digit)]) : Digits
-  (foldr (λ (dig acc) (number dig acc)) (empty-digit) digitlist))
+  (foldl (λ (dig acc) (number dig acc)) (empty-digit) digitlist))
 
 ; Turns a list of decimals into a Decimal
 (define (digitlist->decimals [digitlist : (Listof Digit)]) : Decimals
   (foldr (λ (dig acc) (decimals dig acc)) (empty-decimal) digitlist))
+
+; Turn a number into a digits
+(define (number->digits [n : Number]) : Digits
+  (if (= n 0) (empty-digit) (number (digit (modulo n 10)) (number->digits (floor (/ n 10))))))
 
 ;; Miscellaneous Functions ;;
 ; Compute n modulo 256
@@ -122,17 +132,27 @@
   (modulo n 256))
 
 ; Constructs a pair 1 argument at a time
-(define (pair-curried [x : 'a]) : ('b -> ('a * 'b))
-  (λ (y)
-    (pair x y)))
+; TODO: DEPRECATED
+;(define (pair-curried [x : 'a]) : ('b -> ('a * 'b))
+;  (λ (y)
+;    (pair x y)))
 
 ; Applies the leftside of a pair to the rightside
-(define (apply-pair [p : (('a -> 'b) * 'a)]) : 'b
-  ((fst p) (snd p)))
+; TODO: DEPRECATED
+;(define (apply-pair [p : (('a -> 'b) * 'a)]) : 'b
+;  ((fst p) (snd p)))
 
 ; Absolute value function
 (define (abs [n : Number]) : Number
   (if (< n 0) (* -1 n) n))
+
+; Rounds a number to the nearest whole number
+(define (round [n : Number]) : Number
+  (floor (+ n 0.5)))
+
+; Interpolate two numbers
+(define (interpolate-num [start : Number] [end : Number] [percent : Number]) : Number
+  (+ (* (- end start) percent) start))
 
 ;----- Parser Utilities -----;
 ; This is shorthand notation for using a (ParseResult 'a) in case it exists
@@ -147,8 +167,9 @@
   (ok (pair left right)))
 
 ; Runs a parser on a string
-(define (run-parser [p : (Parser 'a)] [s : String]) : (ParseResult 'a)
-  (p s))
+; TODO: DEPRECATED
+;(define (run-parser [p : (Parser 'a)] [s : String]) : (ParseResult 'a)
+;  (p s))
 
 ; Chooses the (ok) variant of either res1 or res2 and returns it.
 (define (alt [res1 : (ParseResult 'a)] [res2 : (ParseResult 'a)]) : (ParseResult 'a)
