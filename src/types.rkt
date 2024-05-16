@@ -1,18 +1,18 @@
 #lang plait
 
 ;----- Language Types -----;
-; Language type :DONE
+; Language type
 (define-type Language
   [binary-operation (op : BinaryOperation)]
   [unary-operation (op : UnaryOperation)]
   [lang-color (c : RGBColor)])
 
-; General Expression type :DONE
+; General Expression type
 (define-type Expr
   [operation (op : BinaryOperation)]
   [color (c : RGBColor)])
 
-; BinaryOperation type :DONE
+; BinaryOperation type
 (define-type BinaryOperation
   [add (color : RGBColor) (e : Expr)]
   [subtract (color : RGBColor) (e : Expr)]
@@ -22,48 +22,41 @@
   [max (color : RGBColor) (e : Expr)]
   [min (color : RGBColor) (e : Expr)])
 
-; OperatorType type :DONE
+; OperatorType type
 (define-type OperatorType
   [floating-type (n : Float)]
   [string-type (s : String)])
 
-; UnaryOperation type :DONE
+; UnaryOperation type
 (define-type UnaryOperation
   [value-invert (l : Language)]
   [linear-invert (l : Language)])
 
-; Float type :DONE
+; Float type
 (define-type Float
   [float (ds : Decimals)])
 
-; Digits type :DONE
+; Digits type
 (define-type Digits
   [number (first : Digit) (rest : Digits)]
   [empty-digit])
 
-; Digit type :DONE
+; Digit type
 (define-type Digit
   [digit (n : Number)])
 
-; Decimals type :DONE
+; Decimals type
 (define-type Decimals
   [decimals (first : Digit) (rest : Decimals)]
   [empty-decimal])
 
-; RGBColor type :DONE
+; RGBColor type
 (define-type RGBColor
   [rgbcolor (red : Digits) (blue : Digits) (green : Digits)])
 
-; HSVColor type :DONE
+; HSVColor type
 (define-type HSVColor
   [hsvcolor (hue : Number) (saturation : Number) (value : Number)])
-
-; TODO: DEPRECATED
-; Color type
-;(define-type-alias (Color) (Number * (Number * Number)))
-
-; TODO: DEPRECATED
-;(define-type-alias (HSVColor) (Number * (Number * Number)))
 
 ;----- Parser Types -----;
 ; TODO: document
