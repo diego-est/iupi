@@ -63,7 +63,7 @@
 
 ; Invert the luminosity of a color
 (define (color-value-invert [c : RGBColor]) : RGBColor
-  c)
+  (hsv->rgb (rgb->hsv c)))
 
 ; Invert each RGB value of a color
 (define (color-linear-invert [c : RGBColor]) : RGBColor
@@ -186,7 +186,7 @@
                                           (string/p "!"))) s)
     [(ok result) (let [(str (snd result)) (cdr (fst result))] (return cdr (string-type str)))]
     [(err) (do (p-float s)
-             (λ (result) (let [(n (snd result)) (cdr (fst result))] (return cdr (floating-type n)))))]))
+             (λ (result) (let [(n (snd result)) (cdr (fst result))](return cdr (floating-type n)))))]))
 
 ; TODO: document
 (define (p-binary-operation [s : String]) : (ParseResult BinaryOperation)
