@@ -60,62 +60,62 @@
 (define (p-number [s : String]) : (ParseResult Number)
   (do ((many1/p digit/p) s)
     (λ (char-list)
-      (p-result (fst char-list)
+      (return (fst char-list)
                 (foldl (λ (acc x) (+ (* 10 x) acc)) 0 (map char->num (snd char-list)))))))
 
 ; TODO: implement parser for floats
 ; Parses an entire float
-(define (p-float [s : String]) : (ParseResult Number)
-  (do (p-number s)
-    (λ (char-list))))
+;(define (p-float [s : String]) : (ParseResult Number)
+;  (do (p-number s)
+;    (λ (char-list))))
 
 ;; Language Functionality Parsers ;;
 ; Parses a color.
-(define (p-color [s : String]) : (ParseResult Color)
-  (p-rgb-color s))
+;(define (p-color [s : String]) : (ParseResult Color)
+;  (p-rgb-color s))
 
 ; Parses an RGB Color.
 ; A correctly formed color has the following RegEx: "([0-9]+,[0-9]+,[0-9]+)"
-(define (p-rgb-color [s : String]) : (ParseResult Color)
-  (do ((left/p (right/p (char/p #\() p-number) (char/p #\,)) s)
-    (λ (n1) (do ((left/p p-number (char/p #\,)) (fst n1))
-                  (λ (n2) (do ((left/p p-number (char/p #\))) (fst n2))
-                            (λ (n3) (p-result (fst n3) (rgb-color (snd n1) (snd n2) (snd n3))))))))))
+;(define (p-rgb-color [s : String]) : (ParseResult Color)
+;  (do ((left/p (right/p (char/p #\() p-number) (char/p #\,)) s)
+;    (λ (n1) (do ((left/p p-number (char/p #\,)) (fst n1))
+;                  (λ (n2) (do ((left/p p-number (char/p #\))) (fst n2))
+;                            (λ (n3) (return (fst n3) (rgb-color (snd n1) (snd n2) (snd n3))))))))))
 
 ; Helper function for binary operation parsers. Parses a symbol (sym) and runs
 ; (f) on the result to build the resulting Color.
-(define (p-binary-op [s : String] [sym : Char] [f : (Color Color -> 'a)]) : (ParseResult 'a)
-  (do (p-color s)
-    (λ (col1) (do ((right/p (char/p sym) p-color) (fst col1))
-               (λ (col2) (p-result (fst col2) (f (snd col1) (snd col2))))))))
+;(define (p-binary-op [s : String] [sym : Char] [f : (Color Color -> 'a)]) : (ParseResult 'a)
+;  (do (p-color s)
+;    (λ (col1) (do ((right/p (char/p sym) p-color) (fst col1))
+;               (λ (col2) (return (fst col2) (f (snd col1) (snd col2))))))))
 
 ; Addition parser.
-(define (p-add [s : String]) : (ParseResult Operation)
-  (p-binary-op s #\+ (λ (c1 c2)
-                       (add c1 (color c2)))))
+;(define (p-add [s : String]) : (ParseResult BinaryOperation)
+;  (p-binary-op s #\+ (λ (c1 c2)
+;                       (add c1 (color c2)))))
 
 ; Multiplication parser.
-(define (p-multiply [s : String]) : (ParseResult Operation)
-  (p-binary-op s #\* (λ (c1 c2)
-                       (multiply c1 (color c2)))))
+;(define (p-multiply [s : String]) : (ParseResult BinaryOperation)
+;  (p-binary-op s #\* (λ (c1 c2)
+;                       (multiply c1 (color c2)))))
 
 ; Subtraction parser.
-(define (p-subtract [s : String]) : (ParseResult Operation)
-  (p-binary-op s #\- (λ (c1 c2)
-                       (subtract c1 (color c2)))))
+;(define (p-subtract [s : String]) : (ParseResult BinaryOperation)
+;  (p-binary-op s #\- (λ (c1 c2)
+;                       (subtract c1 (color c2)))))
 
 ; Division parser.
-(define (p-divide [s : String]) : (ParseResult Operation)
-  (p-binary-op s #\/ (λ (c1 c2)
-                       (divide c1 (color c2)))))
+;(define (p-divide [s : String]) : (ParseResult BinaryOperation)
+;  (p-binary-op s #\/ (λ (c1 c2)
+;                       (divide c1 (color c2)))))
 
 ; TODO: create parsers for the other operations
 
 ; Parser that can parse any  operation.
-(define (p-op [s : String]) : (ParseResult Operation)
-  (do ((or/p (list p-add p-multiply p-subtract p-divide)) s) ; TODO: Add
+;(define (p-op [s : String]) : (ParseResult BinaryOperation)
+;  (do ((or/p (list p-add p-multiply p-subtract p-divide)) s) ; TODO: Add
    ; implemented parsers to this list
-    (λ (result) (ok result))))
+;    (λ (result) (ok result))))
 
 ; Parser that succeeds if any operation is found
 (define ops : (Parser Char)
@@ -125,6 +125,6 @@
         (char/p #\-)))) ; TODO: add other operations
 
 ; Parser that parses an operation followed by a color.
-(define (half-op [s : String]) : (ParseResult (Char * Color))
-  (do ((seq/p ops p-color) s)
-    (λ (result) (p-result (fst result) (snd result)))))
+;(define (half-op [s : String]) : (ParseResult (Char * Color))
+;  (do ((seq/p ops p-color) s)
+;    (λ (result) (return (fst result) (snd result)))))

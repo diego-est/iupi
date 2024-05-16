@@ -21,7 +21,7 @@
   (λ (input)
     (type-case (ParseResult ('a -> 'b)) (p1 input)
       [(ok f) (do (p2 input)
-                (λ (y) (p-result (fst y) ((snd f) (snd y)))))]
+                (λ (y) (return (fst y) ((snd f) (snd y)))))]
       [(err) (err)])))
 
 ;----- Parser Combinators -----;
@@ -36,7 +36,7 @@
 (define (seq/p [p1 : (Parser 'a)] [p2 : (Parser 'b)]) : (Parser ('a * 'b))
   (λ (input) (do (p1 input)
                (λ (res1) (do (p2 (fst res1))
-                           (λ (res2) (p-result (fst res2) (pair (snd res1) (snd res2)))))))))
+                           (λ (res2) (return (fst res2) (pair (snd res1) (snd res2)))))))))
 
 ; Creates a parser that parses either (p1) or (p2)
 (define (alt/p [p1 : (Parser 'a)] [p2 : (Parser 'a)]) : (Parser 'a)
@@ -62,7 +62,7 @@
 (define (left/p [l : (Parser 'a)] [r : (Parser 'b)]) : (Parser 'a)
   (λ (input) (do (l input)
                (λ (result1) (do (r (fst result1))
-                               (λ (result2) (p-result (fst result2) (snd result1))))))))
+                               (λ (result2) (return (fst result2) (snd result1))))))))
 
 ; Creates a parser out of two parsers that sequentially applies them. But will
 ; only return the result of the second parser.

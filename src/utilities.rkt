@@ -1,6 +1,42 @@
 #lang plait
 
 (require "types.rkt")
+;----- Color Type Implemntation -----;
+; Create a Color.
+;(define (rgb-color [r : Number] [g : Number] [b : Number]) : Color
+;  (pair (mod256 r) (pair (mod256 g) (mod256 b))))
+
+; Get red from color.
+;(define (red [c : Color]) : Number
+;  (fst c))
+
+; Get green from color.
+;(define (green [c : Color]) : Number
+;  (fst (snd c)))
+
+; Get blue from color.
+;(define (blue [c : Color]) : Number
+;  (snd (snd c)))
+
+; Normalize a color modulo 256
+;(define (normalize-color [c : Color]) : Color
+;    (rgb-color (mod256 (red c)) (mod256 (green c)) (mod256 (blue c))))
+
+; get hue from HSVColor
+;(define (hue [c : Color]) : Number
+;  (fst c))
+
+; Get saturation from HSVColor
+;(define (saturation [c : Color]) : Number
+;  (fst (snd c)))
+
+; Get value from HSVColor
+;(define (value [c : Color]) : Number
+;  (snd (snd c)))
+
+; Create an HSVColor.
+;(define (hsv-color [r : Number] [g : Number] [b : Number]) : Color
+;  (pair r (pair g b)))
 
 ;----- Functional utilities -----;
 
@@ -64,6 +100,22 @@
 (define (apply-pair-list [lst : (Listof (('a -> 'b) * 'a))]) : (Listof 'b)
   (map (λ (p) (apply-pair p)) lst))
 
+; Gets the maximum number from a list
+(define (maxel [lst : (Listof Number)]) : Number
+  (foldl (λ (a b) (if  (> a b) a b)) (first lst) lst))
+
+; Gets the minimum element from a list
+(define (minel [lst : (Listof Number)]) : Number
+  (foldl (λ (a b) (if (< a b) a b)) (first lst) lst))
+
+; Turns a list of digits into a Digits
+(define (digitlist->digits [digitlist : (Listof Digit)]) : Digits
+  (foldr (λ (dig acc) (number dig acc)) (empty-digit) digitlist))
+
+; Turns a list of decimals into a Decimal
+(define (digitlist->decimals [digitlist : (Listof Digit)]) : Decimals
+  (foldr (λ (dig acc) (decimals dig acc)) (empty-decimal) digitlist))
+
 ;; Miscellaneous Functions ;;
 ; Compute n modulo 256
 (define (mod256 n)
@@ -91,7 +143,7 @@
     [(err) (err)]))
 
 ; This is shorthand notation for building a (ParseResult 'a)
-(define (p-result [left : String] [right : 'a]) : (ParseResult 'a)
+(define (return [left : String] [right : 'a]) : (ParseResult 'a)
   (ok (pair left right)))
 
 ; Runs a parser on a string

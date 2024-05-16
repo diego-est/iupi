@@ -1,28 +1,63 @@
 #lang plait
 
 ;----- Language Types -----;
-; General Expression type
-(define-type Expr
-  [operation (op : Operation)]
-  [color (c : Color)])
+; Language type
+(define-type Language
+  [binary-operation (op : BinaryOperation)]
+  [unary-operation (op : UnaryOperation)]
+  [lang-color (c : RGBColor)])
 
-; Operation type
-(define-type Operation
-  [add (color : Color) (e : Expr)]
-  [subtract (color : Color) (e : Expr)]
-  [multiply (color : Color) (e : Expr)]
-  [divide (color : Color) (e : Expr)]
-  [value-invert (e : Expr)]
-  [linear-invert (e : Expr)]
-  [interpolate (color : Color) (e : Expr) (percent : Number)]
-  [hue-shift (e : Expr) (shift : Number)]
-  [max (color : Color) (e : Expr)]
-  [min (color : Color) (e : Expr)])
+; General Expression type :DONE
+(define-type Expr
+  [operation (op : BinaryOperation)]
+  [color (c : RGBColor)])
+
+; BinaryOperation type :DONE
+(define-type BinaryOperation
+  [add (color : RGBColor) (e : Expr)]
+  [subtract (color : RGBColor) (e : Expr)]
+  [multiply (color : RGBColor) (e : Expr)]
+  [divide (color : RGBColor) (e : Expr)]
+  [interpolate (color : RGBColor) (e : Expr) (percent : Float)]
+  [max (color : RGBColor) (e : Expr)]
+  [min (color : RGBColor) (e : Expr)])
+
+; OperatorType type :DONE
+(define-type OperatorType
+  [floating-type (n : Float)]
+  [string-type (s : String)])
+
+; UnaryOperation type :DONE
+(define-type UnaryOperation
+  [value-invert (l : Language)]
+  [linear-invert (l : Language)])
+
+; Float type :DONE
+(define-type Float
+  [float (ds : Decimals)])
+
+; Digits type :DONE
+(define-type Digits
+  [number (first : Digit) (rest : Digits)]
+  [empty-digit])
+
+; Digit type :DONE
+(define-type Digit
+  [digit (n : Number)])
+
+; Decimals type :DONE
+(define-type Decimals
+  [decimals (first : Digit) (rest : Decimals)]
+  [empty-decimal])
+
+; RGBColor type :DONE
+(define-type RGBColor
+  [rgbcolor (red : Digits) (blue : Digits) (green : Digits)])
 
 ; Color type
-(define-type-alias (Color) (Number * (Number * Number)))
+;(define-type-alias (Color) (Number * (Number * Number)))
 
-(define-type-alias (HSVColor) (Number * (Number * Number)))
+;(define-type-alias (HSVColor) (Number * (Number * Number)))
 
 ;----- Parser Types -----;
 (define-type (ParseResult 'a)
