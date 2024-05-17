@@ -6,30 +6,31 @@
 (require "combinators.rkt")
 
 ;----- Language Implementation -----;
-; TODO: document
+; Converts a single digit into a number. Basically just returns the number
+; contained inside the digit.
 (define (digit->number [d : Digit]) : Number
   (type-case Digit d
     [(digit n) n]))
 
-; TODO: document
+; Converts a series of digits into a number.
 (define (digits->number [ds : Digits]) : Number
   (type-case Digits ds
     [(number first rest) (+ (digit->number first) (* 10 (digits->number rest)))]
     [(empty-digit) 0]))
 
-; TODO: document
+; Converts a decimal into a number.
 (define (decimals->number [dc : Decimals]) : Number
   (type-case Decimals dc
     [(decimals first rest) (/ (+ (digit->number first) (decimals->number rest)) 10)]
     [(empty-decimal) 0]))
 
-; TODO: document
+; Converts a floating point type number into a number.
 (define (float->number [fp : Float]) : Number
   (type-case Float fp
     [(float ds) (decimals->number ds)]))
 
 ;----- Language Functionality -----;
-; TODO: document
+; Helper function to create binary operations.
 (define (bin-op-builder [c1 : RGBColor] [c2 : RGBColor] [f : (Number Number -> Number)]) : RGBColor
   (type-case RGBColor c1
     [(rgbcolor red1 green1 blue1) (type-case RGBColor c2
@@ -144,8 +145,8 @@
          (s (if (= v 0) 0 (/ c v)))
 	 ] (hsvcolor h s v))]))
 
-;----- The Great Parser -----;
-; TODO: document
+;----- The Parsers -----;
+; Parser that parses a single digit.
 (define (p-digit [s : String]) : (ParseResult Digit)
   (do ((or/p (list (char/p #\1)
                (char/p #\2)
@@ -159,22 +160,25 @@
                (char/p #\0))) s)
     (λ (result) (let [(char (snd result)) (cdr (fst result))] (return cdr (digit (char->num char)))))))
 
-; TODO: document
+; Parser that parses many digits. Will continue consuming digits from the input
+; string until the parser fails. In which case it will return the sequence of
+; digits that have been parsed already.
 (define (p-digits [s : String]) : (ParseResult Digits)
   (do ((many1/p p-digit) s)
     (λ (result) (let [(digitlist (snd result)) (cdr (fst result))] (return cdr (digitlist->digits digitlist))))))
 
-; TODO: document
+; Parser that parses decimal numbers.
 (define (p-decimals [s : String]) : (ParseResult Decimals)
   (do ((many1/p p-digit) s)
     (λ (result) (let [(digitlist (snd result)) (cdr (fst result))] (return cdr (digitlist->decimals digitlist))))))
 
-; TODO: document
+; Parser that parses an entire floating point number.
 (define (p-float [s : String]) : (ParseResult Float)
   (do ((right/p (char/p #\.) p-decimals) s)
     (λ (result) (let* [(decimals (snd result)) (cdr (fst result))] (return cdr (float decimals))))))
 
-; TODO: document
+; Parser that parses an entire color. Returns a (ParseResult RGBColor) where
+; each component of the RGBColor is of type Digits.
 (define (p-color [s : String]) : (ParseResult RGBColor)
   (do ((right/p (char/p #\() p-digits) s)
     (λ (result1) (let [(red (snd result1)) (cdr1 (fst result1))]
@@ -184,7 +188,8 @@
                                       (λ (result3) (let [(blue (snd result3)) (cdr3 (fst result3))]
                                                      (return cdr3 (rgbcolor red green blue))))))))))))
 
-; TODO: document
+; Parser that parses a unary operation. It will also parse the rest of the
+; source code and use it as an argument for the unary operation argument.
 (define (p-unary-operation [s : String]) : (ParseResult UnaryOperation)
   (do ((or/p (list (seq/p (string/p "<^>") p-lang) (seq/p (string/p "<|>") p-lang))) s)
     (λ (result) (let [(op-string (fst (snd result))) (lang (snd (snd result))) (cdr (fst result))]
@@ -192,7 +197,11 @@
                                   (value-invert lang)
                                   (linear-invert lang)))))))
 
-; TODO: document
+; Parser that parses an operator symbol and color. This is a helper function for
+; (p-binary-operation). This function is necessary because the symbol in the
+; middle can either be a symbol string or a floating-point number. Wrapping the
+; result in OperatorType means that the data gathered from this parse can then
+; be type-checked by plait correctly.
 (define (p-operator-type [s : String]) : (ParseResult OperatorType)
   (type-case (ParseResult String) ((or/p (list
                                           (string/p "+")
@@ -205,7 +214,9 @@
     [(err) (do (p-float s)
              (λ (result) (let [(n (snd result)) (cdr (fst result))](return cdr (floating-type n)))))]))
 
-; TODO: document
+; Parser that parses a binary operation. The recursive nature of this parser
+; means that it will continue parsing the input string until it cannot continue.
+; In which case it starts evaluating the expression.
 (define (p-binary-operation [s : String]) : (ParseResult BinaryOperation)
   (do ((seq/p p-color (seq/p p-operator-type p-expr)) s)
     (λ (result) (let* [(col-type-expr (snd result)) (col (fst col-type-expr)) (op-type (fst (snd col-type-expr))) (expr (snd (snd col-type-expr))) (cdr (fst result))]
@@ -219,7 +230,8 @@
                                     [(string=? str "^") (max col expr)]
                                     [(string=? str "!") (min col expr)]]]))))))
 
-; TODO: document
+; Parser that parses an entire expression. This type is necessary to separate
+; the (UnaryOperation)'s from the (BinaryOperation)'s.
 (define (p-expr [s : String]) : (ParseResult Expr)
   (type-case (ParseResult BinaryOperation) (p-binary-operation s)
     [(ok result) (let [(bin-op (snd result)) (cdr (fst result))]
@@ -229,7 +241,7 @@
                             (return cdr (color col)))]
              [(err) (err)])]))
 
-; TODO: document
+; Parser that parses the entire language.
 (define (p-lang [s : String]) : (ParseResult Language)
   (type-case (ParseResult UnaryOperation) (p-unary-operation s)
     [(ok result) (let [(un-op (snd result)) (cdr (fst result))]
@@ -243,20 +255,21 @@
                       [(err) (err)])])]))
 
 ;----- Evaluation -----;
-; TODO: document
+; Evaluates a parsed language and returns the corresponding (RGBColor) that
+; would result if the expression was computed.
 (define (evaluate [src : Language]) : RGBColor
   (type-case Language src
     [(binary-operation op) (eval-binary-operation op)]
     [(unary-operation op) (eval-unary-operation op)]
     [(lang-color col) col]))
 
-; TODO: document
+; Evaluates a unary operation.
 (define (eval-unary-operation [op : UnaryOperation]) : RGBColor
   (type-case UnaryOperation op
     [(value-invert col) (color-value-invert (evaluate col))]
     [(linear-invert col) (color-linear-invert (evaluate col))]))
 
-; TODO: document
+; Evaluates a binary operation.
 (define (eval-binary-operation [op : BinaryOperation]) : RGBColor
   (type-case BinaryOperation op
     [(add col exp) (color-add col (eval-expr exp))]
@@ -267,7 +280,7 @@
     [(max col exp) (color-max col (eval-expr exp))]
     [(min col exp) (color-min col (eval-expr exp))]))
 
-; TODO: document
+; Evaluates an expression.
 (define (eval-expr [e : Expr]) : RGBColor
   (type-case Expr e
     [(operation op) (eval-binary-operation op)]

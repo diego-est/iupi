@@ -59,11 +59,16 @@
   [hsvcolor (hue : Number) (saturation : Number) (value : Number)])
 
 ;----- Parser Types -----;
-; TODO: document
+; This is simply a shorthand including either an (ok) variant, indicating that
+; something of type ('a) was parsed succesfully. The (err) variant indicates
+; that something of type ('a) could not be parsed. The pair inside the (ok)
+; variant includes ('a) the thing that was just parsed and a (String), the rest
+; of the source code that has not been consumed yet.
 (define-type (ParseResult 'a)
   [ok (r : (String * 'a))]
   [err])
 
-; TODO: document
+; An alias for a parser type. A parser is a function that takes a (String) and
+; produces a (ParseResult) of ('a).
 (define-type-alias (Parser 'a)
   (String -> (ParseResult 'a)))

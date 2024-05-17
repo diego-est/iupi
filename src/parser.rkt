@@ -4,7 +4,6 @@
 (require "types.rkt")
 (require "combinators.rkt")
 
-; TODO: DEPRECATED
 ; Flips the arguments for function (a)
 (define (flip a)
   (λ (x y) (a y x)))
