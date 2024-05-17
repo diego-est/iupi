@@ -62,8 +62,10 @@
   (bin-op-builder c1 c2 -))
 
 ; Invert the luminosity of a color
-(define (color-value-invert [c : RGBColor]) : RGBColor
-  (hsv->rgb (rgb->hsv c)))
+(define (color-value-invert [c1 : RGBColor]) : RGBColor
+  (type-case HSVColor (rgb->hsv c1)
+    [(hsvcolor h1 s1 v1)
+    (let [(h2 h1) (s2 s1) (v2 (- 1 v1))] (hsv->rgb [hsvcolor h2 s2 v2]))]))
 
 ; Invert each RGB value of a color
 (define (color-linear-invert [c : RGBColor]) : RGBColor
@@ -79,13 +81,28 @@
                                    (s3 (interpolate-num s1 s2 prcnt))
                                    (v3 (interpolate-num v1 v2 prcnt))] (hsv->rgb (hsvcolor h3 s3 v3)))])]))
 
+; Sums all rgb values of a color
+(define (sumar-color [color : RGBColor] ) : Number
+   (+
+    (+
+    (mod256(digits->number(rgbcolor-red color)))
+    (mod256(digits->number(rgbcolor-blue color))))
+    (mod256(digits->number(rgbcolor-green color)))))
+
 ; Choose the color with larger values
 (define (color-max [c1 : RGBColor] [c2 : RGBColor]) : RGBColor
-  c1)
+      (let ((sumc1 (sumar-color c1))
+            (sumc2 (sumar-color c2)))
+      (cond ((> sumc1 sumc2) c1)
+             (else c2))))
 
 ; Choose the color with smaller values
 (define (color-min [c1 : RGBColor] [c2 : RGBColor]) : RGBColor
-  c1)
+      (let ((sumc1 (sumar-color c1))
+            (sumc2 (sumar-color c2)))
+      (cond ((< sumc1 sumc2) c1)
+             (else c2))))
+
 
 ; Convert HSVColor to RGB
 (define (hsv->rgb [c : HSVColor]) : RGBColor
@@ -120,7 +137,7 @@
 	 (l (/ (+ x+ x-) 2))
          (h [cond
               [(= c 0) 0]
-              [(= v r) (* 60 (modulo (/ (- g b) c) 6))]
+              [(= v r) (* 60 (modulo (round (/ (- g b) c)) 6))]
               [(= v g) (* 60 (+ (/ (- b r) c) 2))]
               [(= v b) (* 60 (+ (/ (- r g) c) 4))]
               [else 0]])
