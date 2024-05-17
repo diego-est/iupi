@@ -287,12 +287,44 @@
     [(color col) col]))
 
 ;----- Tests -----;
-(define test1 "(255,0,42)!(42,42,42)")
-"Source:"
-test1
-"Parse tree:"
-(p-lang test1)
-"Evaluates to:"
-(type-case (ParseResult Language) (p-lang test1)
-  [(ok lang) (evaluate (snd lang))]
-  [(err) (error 'parseErr "error while parsing")])
+(define accept1 "(0,000000,010)")
+(define accept2 "<|><^>(0,0,0)")
+(define accept3 "(0,0,0)/(0,0,0)")
+(define accept4 "(400,100,200)+(10,10,10)/(2,2,2)")
+(define accept5 "(0,0,00).32(0100,319,7880).0(400,100,200)")
+
+(define deny1 "(0,0,0.0)")
+(define deny2 "<|>(0,0,00)<^>(100,319,80)")
+(define deny3 "(0,0,00)0.32(0100,319,7880)")
+(define deny4 "(400,100,200)++(10,10,10)")
+(define deny5 "(400,100,200)+")
+
+; Testing function for strings.
+(define (tester [s : String]) : RGBColor
+  (type-case (ParseResult Language) (p-lang s)
+    [(ok lang) (cond
+                 [(not (string=? "" (fst lang))) (error 'incompleteParse (fst lang))]
+                 [else (evaluate (snd lang))])]
+    [(err) (error 'parseFailed "not a valid string")]))
+
+"Accept 1:"
+(tester accept1)
+"Accept 2:"
+(tester accept2)
+"Accept 3:"
+(tester accept3)
+"Accept 4:"
+(tester accept4)
+"Accept 5:"
+(tester accept5)
+
+;"Deny 1:"
+;(tester deny1)
+;"Deny 2:"
+;(tester deny2)
+;"Deny 3:"
+;(tester deny3)
+;"Deny 4:"
+;(tester deny4)
+;"Deny 5:"
+;(tester deny5)
